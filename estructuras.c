@@ -1,4 +1,4 @@
-#include "Estructuras.h"
+#include "estructuras.h"
 
 p_lista crear_lista() {
     p_lista lista = (p_lista)malloc(sizeof(lista));
