@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include "estructuras.h"
 
 void leer_archivo(p_lista lista, const char *nombre_archivo) {
