@@ -186,14 +186,23 @@ void mostrar_y_generar_archivo_por_marca_y_color(p_lista lista, char *marca, cha
     printf("Cantidad de latas: %d\n", cantidad_latas);
 
     p_nodo actual = lista->nodo;
+    char informacion[1024] = "";
+    char entrada[256];
+    
+    sprintf(entrada, "Marca: %s, Color: %s\n", marca, color);
+    strcat(informacion, entrada);
 
     while (actual) {
         if (strcmp(actual->elemento->Marca, marca) == 0 && strcmp(actual->elemento->Color, color) == 0) {
-            printf("Marca: %s, Color: %s, Tamaño: %.2f litros\n",
-                   actual->elemento->Marca, actual->elemento->Color, actual->elemento->tamaño);
+            char detalle[256];
+            sprintf(detalle, "Marca: %s, Color: %s, Tamaño: %.2f litros\n",
+                    actual->elemento->Marca, actual->elemento->Color, actual->elemento->tamaño);
+            strcat(informacion, detalle);
         }
         actual = actual->siguiente;
     }
+
+    printf("%s", informacion);
 
     char opcion;
     printf("¿Desea generar un archivo con la información mostrada? (s/n): ");
@@ -213,16 +222,8 @@ void mostrar_y_generar_archivo_por_marca_y_color(p_lista lista, char *marca, cha
             return;
         }
 
+        fprintf(archivo, "%s", informacion);
         fprintf(archivo, "Cantidad de latas: %d\n", cantidad_latas);
-
-        actual = lista->nodo;
-        while (actual) {
-            if (strcmp(actual->elemento->Marca, marca) == 0 && strcmp(actual->elemento->Color, color) == 0) {
-                fprintf(archivo, "Marca: %s, Color: %s, Tamaño: %.2f litros\n",
-                        actual->elemento->Marca, actual->elemento->Color, actual->elemento->tamaño);
-            }
-            actual = actual->siguiente;
-        }
 
         fclose(archivo);
         printf("Archivo generado exitosamente: %s\n", nombre_archivo);
