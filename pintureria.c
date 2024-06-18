@@ -118,10 +118,10 @@ void menu(p_lista lista) {
                 break;
             case 9:
                 liberar_lista(lista);
-                printf("Adiós!\n");
+                printf("¡Gracias por Elegirnos! By: Rama // From: Fundamentez.\n");
                 break;
             default:
-                printf("Opción inválida\n");
+                printf("Opción NO valida\n");
                 break;
         }
     } while (opcion != 9);
