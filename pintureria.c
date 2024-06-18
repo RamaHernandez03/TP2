@@ -1,4 +1,27 @@
-#include "Estructuras.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "estructuras.h"
+
+void leer_archivo(p_lista lista, const char *nombre_archivo) {
+    FILE *archivo = fopen(nombre_archivo, "r");
+    if (!archivo) {
+        printf("No se pudo abrir el archivo %s\n", nombre_archivo);
+        return;
+    }
+    char marca[20];
+    char color[20];
+    float tamaño;
+    while (fscanf(archivo, "%s %s %f", marca, color, &tamaño) == 3) {
+        p_lata nueva_lata = (p_lata)malloc(sizeof(lata));
+        strcpy(nueva_lata->Marca, marca);
+        strcpy(nueva_lata->Color, color);
+        nueva_lata->tamaño = tamaño;
+        agregar_elemento_al_final(lista, nueva_lata);
+    }
+
+    fclose(archivo);
+}
 
 void menu(p_lista lista) {
     int opcion;
@@ -10,11 +33,11 @@ void menu(p_lista lista) {
         printf("1. Agregar producto al inicio\n");
         printf("2. Agregar producto al final\n");
         printf("3. Remover producto\n");
-        printf("4. Verificar disponibilidad\n");
-        printf("5. Verificar color y cantidad\n");
-        printf("6. Total por color\n");
-        printf("7. Total por marca\n");
-        printf("8. Total por marca y color\n");
+        printf("4. Verificar Disponibilidad\n");
+        printf("5. Verificar Color y Cantidad\n");
+        printf("6. Total Color\n");
+        printf("7. Total Marca\n");
+        printf("8. Total por Marca y Color\n");
         printf("9. Salir\n");
         printf("Ingrese una opción: ");
         scanf("%d", &opcion);
@@ -75,7 +98,7 @@ void menu(p_lista lista) {
             case 5:
                 printf("Ingrese el Color: ");
                 scanf("%s", color);
-                printf("Ingrese Tamaño de lata: ");
+                printf("Ingrese el Tamaño de la lata: ");
                 scanf("%f", &tamaño);
                 verificar_color_y_cantidad(lista, color, tamaño);
                 break;
@@ -109,6 +132,7 @@ void menu(p_lista lista) {
 
 int main() {
     p_lista lista = crear_lista();
+    leer_archivo(lista, "stock.txt"); // Leer el archivo de stock al iniciar el programa
     menu(lista);
     return 0;
 }
