@@ -132,7 +132,7 @@ void menu(p_lista lista) {
 
 int main() {
     p_lista lista = crear_lista();
-    leer_archivo(lista, "stock.txt"); // Leer el archivo de stock al iniciar el programa
+    leer_archivo(lista, "stock.txt"); 
     menu(lista);
     return 0;
 }
