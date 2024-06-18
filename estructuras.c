@@ -82,17 +82,71 @@ void liberar_lista(p_lista lista) {
     free(lista);
 }
 
-void verificar_disponibilidad(p_lista lista, char *color) {
+void mostrar_y_generar_archivo(p_lista lista, char *mensaje_consola, char *mensaje_archivo, char *dato) {
     p_nodo actual = lista->nodo;
     int encontrado = 0;
+
     while (actual) {
-        if (strcmp(actual->elemento->Color, color) == 0) {
-            printf("Marca: %s, Tamaño: %.2f litros\n", actual->elemento->Marca, actual->elemento->tamaño);
+        if (strcmp(actual->elemento->Color, dato) == 0) {
+            printf("Marca: %s, Color: %s, Tamaño: %.2f litros\n",
+                   actual->elemento->Marca, actual->elemento->Color, actual->elemento->tamaño);
             encontrado = 1;
         }
         actual = actual->siguiente;
     }
+
     if (!encontrado) {
+        printf("No se encontraron productos %s.\n", mensaje_consola);
+        return;
+    }
+
+    char opcion;
+    printf("¿Desea generar un archivo con la información mostrada? (s/n): ");
+    getchar();
+    scanf("%c", &opcion);
+
+    if (opcion == 's' || opcion == 'S') {
+        char nombre_archivo[50];
+        printf("Ingrese el nombre del archivo (sin extensión .txt): ");
+        scanf("%s", nombre_archivo);
+
+        strcat(nombre_archivo, ".txt");
+
+        FILE *archivo = fopen(nombre_archivo, "w");
+        if (!archivo) {
+            printf("Error al abrir el archivo %s para escritura.\n", nombre_archivo);
+            return;
+        }
+
+        actual = lista->nodo;
+        while (actual) {
+            if (strcmp(actual->elemento->Color, dato) == 0) {
+                fprintf(archivo, "Marca: %s, Color: %s, Tamaño: %.2f litros\n",
+                        actual->elemento->Marca, actual->elemento->Color, actual->elemento->tamaño);
+            }
+            actual = actual->siguiente;
+        }
+
+        fclose(archivo);
+        printf("Archivo generado exitosamente: %s\n", nombre_archivo);
+    }
+}
+
+void verificar_disponibilidad(p_lista lista, char *color) {
+    p_nodo actual = lista->nodo;
+    int encontrado = 0;
+
+    while (actual) {
+        if (strcmp(actual->elemento->Color, color) == 0) {
+            encontrado = 1;
+            break;
+        }
+        actual = actual->siguiente;
+    }
+
+    if (encontrado) {
+        mostrar_y_generar_archivo(lista, "disponibles en el color especificado", "Verificar Disponibilidad", color);
+    } else {
         printf("Color no disponible\n");
     }
 }
@@ -100,14 +154,18 @@ void verificar_disponibilidad(p_lista lista, char *color) {
 void verificar_color_y_cantidad(p_lista lista, char *color, float tamaño) {
     p_nodo actual = lista->nodo;
     int encontrado = 0;
+
     while (actual) {
         if (strcmp(actual->elemento->Color, color) == 0 && actual->elemento->tamaño == tamaño) {
-            printf("Marca: %s\n", actual->elemento->Marca);
             encontrado = 1;
+            break;
         }
         actual = actual->siguiente;
     }
-    if (!encontrado) {
+
+    if (encontrado) {
+        mostrar_y_generar_archivo(lista, "con el color y tamaño especificados", "Verificar Color y Cantidad", color);
+    } else {
         printf("Stock no disponible\n");
     }
 }
@@ -116,6 +174,7 @@ void total_color(p_lista lista, char *color) {
     p_nodo actual = lista->nodo;
     float total_litros = 0;
     int cantidad_latas = 0;
+
     while (actual) {
         if (strcmp(actual->elemento->Color, color) == 0) {
             total_litros += actual->elemento->tamaño;
@@ -123,9 +182,11 @@ void total_color(p_lista lista, char *color) {
         }
         actual = actual->siguiente;
     }
+
     if (cantidad_latas > 0) {
         printf("Total Color: %.2f litros\n", total_litros);
         printf("Cantidad de Latas: %d\n", cantidad_latas);
+        mostrar_y_generar_archivo(lista, "con el color especificado", "Total Color", color);
     } else {
         printf("Color no disponible\n");
     }
@@ -134,27 +195,20 @@ void total_color(p_lista lista, char *color) {
 void total_marca(p_lista lista, char *marca) {
     p_nodo actual = lista->nodo;
     int cantidad_latas = 0;
-    char colores[lista->cantidad_nodos][20];
-    int colores_contados = 0;
 
     while (actual) {
         if (strcmp(actual->elemento->Marca, marca) == 0) {
-            int color_ya_contado = 0;
-            for (int i = 0; i < colores_contados; i++) {
-                if (strcmp(colores[i], actual->elemento->Color) == 0) {
-                    color_ya_contado = 1;
-                    break;
-                }
-            }
-            if (!color_ya_contado) {
-                strcpy(colores[colores_contados++], actual->elemento->Color);
-                printf("Color: %s\n", actual->elemento->Color);
-            }
             cantidad_latas++;
         }
         actual = actual->siguiente;
     }
-    printf("Cantidad de latas: %d\n", cantidad_latas);
+
+    if (cantidad_latas > 0) {
+        printf("Cantidad de latas de la marca %s: %d\n", marca, cantidad_latas);
+        mostrar_y_generar_archivo(lista, "de la Marca especificada", "Total Marca", marca);
+    } else {
+        printf("Marca no disponible\n");
+    }
 }
 
 void total_por_marca_y_color(p_lista lista, char *marca, char *color) {
@@ -169,9 +223,12 @@ void total_por_marca_y_color(p_lista lista, char *marca, char *color) {
         }
         actual = actual->siguiente;
     }
+
     if (cantidad_latas > 0) {
-        printf("Total Color: %.2f litros\n", total_litros);
+        printf("Total por Marca (%s) y Color (%s): %.2f litros\n", marca, color, total_litros);
         printf("Cantidad de latas: %d\n", cantidad_latas);
+        mostrar_y_generar_archivo(lista, "de la Marca y Color especificados", "Total por Marca y Color", marca);
+        mostrar_y_generar_archivo(lista, "de la Marca y Color especificados", "Total por Marca y Color", color);
     } else {
         printf("Marca y color no disponibles\n");
     }
